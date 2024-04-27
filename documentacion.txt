@@ -1,0 +1,15 @@
+I M P O R T A N T E:
+
+NUESTRA implementacion de la funcion Vecino esta mal? El if del principio parece que siempre se da
+y te devuelve la super potencia esa.
+
+funciones.c y EstructuraGrafo24.h no son parte del lab2, es nuestra implementacion de las cosas del grafo, pero el lab 2 deberia 
+funcionar con otras implementaciones de otros grupos.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Compilar con esta hueva:
+    gcc -Wall -Wextra -O3 -std=c99 -fsanitize=address -o main main.c funciones.c funciones2.c
+
+despues:
+    ./main < K5.txt
