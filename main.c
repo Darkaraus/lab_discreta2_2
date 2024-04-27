@@ -17,8 +17,8 @@ int main()
     // Si o si el tamaño de Orden tiene que ser la cantidad de vertices, por la consigna.
     u32 Orden[9] = {0u,1u,2u,3u,4u,5u,6u,7u,8u};
     Greedy(G, Orden);
-
-
+    // DICOSRRRRRRDDDDDDD
+    /* 
     printf("Numero de vertices: %d\n", NumeroDeVertices(G));
     printf("Numero de lados: %d\n", NumeroDeLados(G));
     printf("Delta: %d\n", Delta(G));
@@ -36,7 +36,7 @@ int main()
         printf("\n");
     } 
     
-    
+    */
 
 /*     printf("Color del vertice 0: %u \n", Color(0, G));
     printf("Vecino 0 del vertice 0: %d\n", Vecino(0, 0, G));

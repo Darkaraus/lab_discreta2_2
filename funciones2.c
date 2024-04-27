@@ -8,6 +8,7 @@
 // No hace falta chequear el tamaño de Orden, siempre es n, consigna. 
 bool checkOrden(u32 size, u32* Orden)
 {
+
     // array de bools...
     bool *found_vertices = malloc(size * sizeof(bool));
 
@@ -34,7 +35,7 @@ bool checkOrden(u32 size, u32* Orden)
             {
                 founded = false;
             }
-
+        
             found_vertices[Orden[i]] = true; 
             
         } else {
@@ -47,12 +48,22 @@ bool checkOrden(u32 size, u32* Orden)
 
 u32 m(Grafo G)
 {
+    
     return 0;
 }
 
-u32 M(Grafo G)
+u32 M(Grafo G, color ColorComp)
 {
-    return 0;
+    u32 VerID;
+    u32 gradoMax = 0;
+    // hay que guardar el vertice con el mayor grado
+    for(u32 i = 0 ; i < NumeroDeVertices(G); i++){
+        if (Color(i,G) == ColorComp && gradoMax < Grado(i,G)){
+            gradoMax = Grado(i,G); 
+            VerID = i; 
+        }
+    }
+    return gradoMax;
 }
 
 u32 Greedy(Grafo G,u32* Orden)
@@ -60,8 +71,9 @@ u32 Greedy(Grafo G,u32* Orden)
     // Chequeo del orden ------------------------
     u32 cantVertice = NumeroDeVertices(G); 
     bool is_biyeccion = checkOrden(cantVertice, Orden);
-    if (!is_biyeccion) 
+    if (!is_biyeccion) // 
     {
+        printf("Orden Biyectivo\n");
         return(POTENCIA);
     }
     printf("Orden Biyectivo\n");
@@ -70,21 +82,27 @@ u32 Greedy(Grafo G,u32* Orden)
     // Greedy -----------------------------------
     u32 cor; // color en portugues jejrejrjejrej
     u32 corMax = 0;
-
-    
+    color colores[cantVertice]; // Array de colores
+    u32 contador = 0;
     for (size_t i = 0; i < cantVertice; i++)
     {
-        cor = 1;
-        for (size_t k = 0; k < Grado(Orden[i], G); k++) // O(Grado^2) oh no hermano
-        {                                               // Funciona pero es inutil teniendo complejidad cuadratica
-            for (size_t j = 0; j < Grado(Orden[i], G); j++) // Recorro los vecinos del vertice que toca en el orden
-            {
-                u32 vecinoID = Vecino(j, Orden[i], G); // id del vecino
-                if (cor == Color(vecinoID, G))
-                {
-                    cor++;
-                }
-            }
+        bool coloresUsados[cantVertice + 1]; // Array de colores usados
+        memset(coloresUsados, false, sizeof(coloresUsados)); // Inicializamos en false
+
+        for (size_t k = 0; k < Grado(Orden[i], G); k++) 
+        {                                               
+            u32 vecinoID = Vecino(k, Orden[i], G); // id del vecino
+            u32 colorVecino = Color(vecinoID, G);
+            coloresUsados[colorVecino] = true; // Marcamos el color del vecino como usado
+            contador++;
+        } 
+
+        // Buscamos el primer color que no esté en uso
+        u32 cor = 1;
+        while (coloresUsados[cor]) 
+        {
+            cor++;
+            contador++;
         }
         
         AsignarColor(cor, Orden[i], G);
@@ -93,13 +111,18 @@ u32 Greedy(Grafo G,u32* Orden)
         {
             corMax = cor;
         }
+        contador++;
     }
-        
+    
+    printf("Maximo color: %u\n", corMax);
+    printf("Numeros lados: %u\n", NumeroDeLados(G));
+    printf("Complejidad : %u\n", contador);
+ 
     return corMax;
 }
 
 char GulDukat(Grafo G,u32* Orden)
-{
+{   
     // Es una idea nomas
     u32 cantVertice = NumeroDeVertices(G);
     color *vertColores = malloc(NumeroDeVertices(G) * sizeof(color));
@@ -121,9 +144,10 @@ char GulDukat(Grafo G,u32* Orden)
     
     for (u32 cor = 1; cor <= corMax; cor++)
     {
-        if (cor % 4 == 0)
+        if (cor % 4 == 0) // 
         {
             // u32 divisibles4[cantVertice];
+            // M(divisibles4, G); 
             // Ordenar ese array
         }
         else if (cor % 2 == 0)
@@ -135,7 +159,7 @@ char GulDukat(Grafo G,u32* Orden)
             // Ordenar ese array
         }
     }
-    // Concatenar esos tres arrays, cada uno ordenado a su manera, resultado final ordenado como piden.
+    // Concatenar esos tres arrays, cada uno ordenado a su manera, resultado final ordenado como piden. 
     
     free(vertColores);
 
