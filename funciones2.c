@@ -46,6 +46,20 @@ bool checkOrden(u32 size, u32* Orden)
     return founded;
 }
 
+u32 maxGrado(u32* array_de_ids, u32 size_de_ese_array, Grafo G)
+{
+    u32 zaza = 0;
+    for (u32 i = 0; i < size_de_ese_array; i++)
+    {
+        if (zaza < Grado(array_de_ids[i], G))
+        {
+            zaza = Grado(array_de_ids[i], G);
+        } 
+    }
+    
+    return zaza;
+}
+
 u32 m(u32 a, u32 b, Grafo G)
 {
     if (Grado(a, G) > Grado(b, G))
@@ -59,18 +73,21 @@ u32 m(u32 a, u32 b, Grafo G)
     }
 }
 
-u32 M(u32 a, u32 b, Grafo G)
+u32 M(struct ArrayConTamaño *a, struct ArrayConTamaño *b, Grafo G)
 {
-    if (Grado(a, G) < Grado(b, G))
-    {
-        return -1;
-    } else if (Grado(a, G) > Grado(b, G))
+    printf(" %u ", a->arr[0]);
+    if (maxGrado(a->arr, a->size, G) < maxGrado(b->arr, b->size, G))
     {
         return 1;
+    } else if (maxGrado(a->arr, a->size, G) > maxGrado(b->arr, b->size, G))
+    {
+        return -1;
     } else {
         return 0;
     }
 }
+
+
 
 u32 Greedy(Grafo G,u32* Orden)
 {
@@ -79,15 +96,19 @@ u32 Greedy(Grafo G,u32* Orden)
     bool is_biyeccion = checkOrden(cantVertice, Orden);
     if (!is_biyeccion) // 
     {
-        printf("Orden Biyectivo\n");
+        printf("Orden No Biyectivo\n");
         return(POTENCIA);
     }
     printf("Orden Biyectivo\n");
 
+    // Vuelvo colores a 0
+    for (size_t i = 0; i < cantVertice; i++)
+    {
+        AsignarColor(0, i, G);
+    }
 
     // Greedy -----------------------------------
     u32 corMax = 0;
-    u32 contador = 0;
     for (size_t i = 0; i < cantVertice; i++)
     {
         bool coloresUsados[cantVertice + 1]; // Array de colores usados
@@ -98,7 +119,6 @@ u32 Greedy(Grafo G,u32* Orden)
             u32 vecinoID = Vecino(k, Orden[i], G); // id del vecino
             u32 colorVecino = Color(vecinoID, G);
             coloresUsados[colorVecino] = true; // Marcamos el color del vecino como usado
-            contador++;
         } 
 
         // Buscamos el primer color que no esté en uso
@@ -106,7 +126,6 @@ u32 Greedy(Grafo G,u32* Orden)
         while (coloresUsados[cor]) 
         {
             cor++;
-            contador++;
         }
         
         AsignarColor(cor, Orden[i], G);
@@ -115,19 +134,17 @@ u32 Greedy(Grafo G,u32* Orden)
         {
             corMax = cor;
         }
-        contador++;
     }
+    
     
     printf("Maximo color: %u\n", corMax);
     printf("Numeros lados: %u\n", NumeroDeLados(G));
-    printf("Complejidad : %u\n", contador);
- 
+    printf("----------  G R E E D Y    C O M P L E T O ----------\n");
     return corMax;
 }
 
 char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un mate o un cafe <!!!>
 {   
-    u32 contador = 0; // Es para complejidad
     u32 cantVertice = NumeroDeVertices(G);
     color *vertColores = malloc(NumeroDeVertices(G) * sizeof(color));
     if (vertColores == NULL)
@@ -144,20 +161,37 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         {
             corMax = vertColores[i];
         }
-        contador++; // <> Es para complejidad
     }
     free(vertColores); // El array solo fue usado para conseguir el color maximo... Era para darle uso a ExtraerColores, para que sirve si no? capaz sirva jajaja
     // REINICIAR CEREBRO, solo conseguimos el color maximo
 
-    u32 divisibles4[cantVertice];
-    u32 pares[cantVertice];
-    u32 impares[cantVertice];
-    u32 size_divisibles4 = 0;
-    u32 size_pares = 0;
-    u32 size_impares = 0;
+    struct ArrayConTamaño Div4[cantVertice];
+    struct ArrayConTamaño Par[cantVertice];
+    struct ArrayConTamaño Impar[cantVertice];
+
+    // Inicializamos tamaños
+    for (u32 i = 0; i < cantVertice; i++)
+    {
+        Div4[i].size = 0;
+        Par[i].size = 0;
+        Impar[i].size = 0;
+    }
+
+
+    u32 index_Div4 = 0; // de paso en estos index queda el tamaño del array grande 
+    u32 index_Par = 0;
+    u32 index_Impar = 0;
 
     for (u32 cor = 0; cor <= corMax; cor++)
     {
+        u32 *divisibles4 = malloc(cantVertice * sizeof(u32)); // array temporales para cada color. Se ordenan y se añaden al grande de su categoria (PROGAMACION!!!)
+        u32 *pares = malloc(cantVertice * sizeof(u32));
+        u32 *impares = malloc(cantVertice * sizeof(u32));
+
+        u32 size_divisibles4 = 0;
+        u32 size_pares = 0;
+        u32 size_impares = 0;
+
         for (u32 i = 0; i < cantVertice; i++)
         {
             if (Color(i, G) == cor)
@@ -167,9 +201,10 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
                     divisibles4[size_divisibles4++] = i;
                     //printf("  Vertice con color divisible por 4: %u\n", i);
                 }
-                else if (cor % 2 == 0)
+                else if (cor % 2 == 0 && cor % 4 != 0)
                 {
                     pares[size_pares++] = i;
+    
                     //printf("  Vertice con color divisible solo por 2: %u\n", i);
                 }
                 else
@@ -178,57 +213,93 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
                     //printf("  Vertice con color divisible impar: %u\n", i);
                 }
             }
-            contador++; // <> Es para complejidad
         }
+
+        // SIEMPRE AÑADIIIIR <-------- nuevo 4/29/2024
+        if (size_divisibles4 != 0) 
+        {
+            Div4[index_Div4].size = size_divisibles4;
+            Div4[index_Div4++].arr = divisibles4;
+            
+        } else if (size_pares != 0)
+        {
+            Par[index_Par].size = size_pares;
+            Par[index_Par++].arr = pares;
+            
+        } else if (size_impares != 0)
+        {
+            Impar[index_Impar].size = size_impares;
+            Impar[index_Impar++].arr = impares;
+            
+        } // No biyectivo por que no lo metemos en Orden
     }
-
-    // L E E R  
-    // qsort_r esta re bueno, argumentos:
-    // ordena el array del primer argumento
-    // size es la cantidad de elementos
-    // el sizeof es el tamaño de cada elemento
-    // el cuarto argumento es la funcion de comparacion, es interesante leerlo! https://en.cppreference.com/w/c/algorithm/qsort
-    /*
-            comparison function which returns ​a negative integer value if the first argument is less than the second,
-            a positive integer value if the first argument is greater than the second and zero if the arguments are equivalent.
-    */
-    // Quinto elemento exclusivo de la qsort_r, re cheto, le pasa un tercer argumento a la funcion de comparacion
-    // Asi podemos pasarle el grafo y hacer todas las funciones del grafo
-    qsort_r(divisibles4, size_divisibles4, sizeof(u32), M, G);
-    qsort_r(pares, size_pares, sizeof(u32), m, G); // No entendi que es M + m, esto es un placeholder 
-    qsort_r(impares, size_impares, sizeof(u32), m, G);
-
-    // Importante: Funciona, orden biyectivo en grafo con mil vertices y ochentamil aristas.
-    // Importante: No hay memory leaks
-    // Importante: si quieres probar otro grafo, cambiar en el main el tamaño del array de Orden. (consigna!)
-    // Importantisimo: Puede que este mal. Dentro de cada array bonito divisibles4 pares impares se ordenan muchos colores viste
-    //       Despues de ordenar, dentro de divisibles 4 puede ser id: [0, 5, 6, 7, 8, 9, 44, 12]
-    //                                                         color: [4, 8, 4, 4, 8, 8, 16, 8]
-    // Osea, queda ordenado por su GRADO, pero no quedan pegaditos sus colores. Creo que tienen que quedar pegaditos
-
-
-    //printf("A unir los arrays...\n");
+    
     u32 index = 0;
-    for (u32 i = 0; i < size_divisibles4; i++) {
-        Orden[index++] = divisibles4[i];
-        contador++; // <> Es para complejidad
+    printf("\n\n");
+    qsort_r(Div4, index_Div4, sizeof(struct ArrayConTamaño), M, G);
+    printf("        Cantidad de colores div4: %u\n", index_Div4);
+    for (u32 i = 0; i < index_Div4; i++)
+    {   
+        printf("        Cantidad de color %u: %u\n", Color(Div4[i].arr[0],G), Div4[i].size);
+        printf("        Vertices con color %u:       ", Color(Div4[i].arr[0],G));
+        for (u32 j = 0; j < Div4[i].size; j++)
+        {
+            printf(" %u ", Div4[i].arr[j]);
+            Orden[index++] = Div4[i].arr[j];
+        }
+        free(Div4[i].arr);
     }
-    for (u32 i = 0; i < size_pares; i++) {
-        Orden[index++] = pares[i];
-        contador++; // <> Es para complejidad
+    printf("\n\n");
+    qsort_r(Par, index_Par, sizeof(struct ArrayConTamaño), M, G);
+    printf("        Cantidad de colores pares: %u\n", index_Par);
+    for (u32 i = 0; i < index_Par; i++)
+    {
+        printf("        Cantidad de color %u: %u\n", Color(Par[i].arr[0], G), Par[i].size);
+        printf("        Vertices con color %u:       ", Color(Par[i].arr[0], G));
+        for (u32 j = 0; j < Par[i].size; j++)
+        {
+            printf(" %u ", Par[i].arr[j]);
+            Orden[index++] = Par[i].arr[j];
+        }
+        printf("\n");
+        free(Par[i].arr);
     }
-    for (u32 i = 0; i < size_impares; i++) {
-        Orden[index++] = impares[i];
-        contador++; // <> Es para complejidad
+    printf("\n\n");
+    qsort_r(Impar, index_Impar, sizeof(struct ArrayConTamaño), M, G);
+    printf("        Cantidad de colores impares: %u\n", index_Impar);
+    for (u32 i = 0; i < index_Impar; i++)
+    {
+        printf("        Cantidad de color %u: %u\n", Color(Impar[i].arr[0], G), Impar[i].size);
+        printf("        Vertices con color %u:       ", Color(Impar[i].arr[0], G));
+        printf("[");
+        for (u32 j = 0; j < Impar[i].size; j++)
+        {
+            printf(" %u ", Impar[i].arr[j]);
+            Orden[index++] = Impar[i].arr[j];
+        }
+        printf("]\n");
+        free(Impar[i].arr);
     }
+    printf("\n\n");
+    printf("Nuevo orden mundial: \n");
+    printf("id:   ");
+    for (u32 i = 0; i < cantVertice; i++)
+    {
+        printf(" %u ", Orden[i]);
+    }
+    printf("\ncolor:");
+    for (u32 i = 0; i < cantVertice; i++)
+    {
+        printf(" %u ", Color(Orden[i], G));
+    }
+    printf("\ngrado:");
+    for (u32 i = 0; i < cantVertice; i++)
+    {
+        printf(" %u ", Grado(Orden[i], G));
+    }
+    printf("\n\n");
+   
+    printf("index_Div4: %u, index_Par: %u, index_Impar: %u\n", index_Div4, index_Par, index_Impar);
 
-
-    
-    printf("+ Complejidad : %u\n", contador); // <> Es para complejidad 
     return '0'; // si esta bien devuelve esto, consigna
-}
-
-char ElimGarak(Grafo G,u32* Orden)
-{
-    
 }

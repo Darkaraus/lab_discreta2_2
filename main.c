@@ -16,15 +16,13 @@ int main()
 
     // Si o si el tamaño de Orden tiene que ser la cantidad de vertices, por la consigna.
     
-    u32 Orden[1072];
+    u32 Orden[9];
     GulDukat(G, Orden); // Al principio, todos colores 0, es el orden natural, 0,1,2,3,...
     Greedy(G, Orden);
-
-    u32 Dios[1072];
-    GulDukat(G, Dios);
-    Greedy(G, Dios);
+    GulDukat(G, Orden);
+    Greedy(G, Orden);
     
-    /* 
+    
     printf("Numero de vertices: %d\n", NumeroDeVertices(G));
     printf("Numero de lados: %d\n", NumeroDeLados(G));
     printf("Delta: %d\n", Delta(G));
@@ -42,7 +40,7 @@ int main()
         printf("\n");
     } 
     
-    */
+    
 
 /*     printf("Color del vertice 0: %u \n", Color(0, G));
     printf("Vecino 0 del vertice 0: %d\n", Vecino(0, 0, G));
