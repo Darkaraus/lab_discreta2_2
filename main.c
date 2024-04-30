@@ -22,7 +22,7 @@ int main()
     GulDukat(G, Orden);
     Greedy(G, Orden);
     
-    
+    /*
     printf("Numero de vertices: %d\n", NumeroDeVertices(G));
     printf("Numero de lados: %d\n", NumeroDeLados(G));
     printf("Delta: %d\n", Delta(G));
@@ -40,7 +40,7 @@ int main()
         printf("\n");
     } 
     
-    
+    */
 
 /*     printf("Color del vertice 0: %u \n", Color(0, G));
     printf("Vecino 0 del vertice 0: %d\n", Vecino(0, 0, G));

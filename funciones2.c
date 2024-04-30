@@ -6,88 +6,6 @@
 #define POTENCIA 4294967295U
 
 // No hace falta chequear el tamaño de Orden, siempre es n, consigna. 
-bool checkOrden(u32 size, u32* Orden)
-{
-
-    // array de bools...
-    bool *found_vertices = malloc(size * sizeof(bool));
-
-    // Error por si no funca malloc...
-    if (found_vertices == NULL)
-    {
-        return false;
-    }
-
-    // Lo lleno de false (no encontro ninguna aun xd)
-    for (size_t i = 0; i < size; i++)
-    {
-        found_vertices[i] = false;
-    }
-
-    bool founded = true;
-    for (size_t i = 0; i < size; i++)
-    {
-        // Obvio no hay vertices > size, van de 0 a n
-        if (Orden[i] < size)
-        {
-            // Si ya la encontro entonces no hay biyeccion  
-            if (found_vertices[Orden[i]])
-            {
-                founded = false;
-            }
-        
-            found_vertices[Orden[i]] = true; 
-            
-        } else {
-            founded = false;
-        }
-    }
-    free(found_vertices);
-    return founded;
-}
-
-u32 maxGrado(u32* array_de_ids, u32 size_de_ese_array, Grafo G)
-{
-    u32 zaza = 0;
-    for (u32 i = 0; i < size_de_ese_array; i++)
-    {
-        if (zaza < Grado(array_de_ids[i], G))
-        {
-            zaza = Grado(array_de_ids[i], G);
-        } 
-    }
-    
-    return zaza;
-}
-
-u32 m(u32 a, u32 b, Grafo G)
-{
-    if (Grado(a, G) > Grado(b, G))
-    {
-        return -1;
-    } else if (Grado(a, G) < Grado(b, G))
-    {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-u32 M(struct ArrayConTamaño *a, struct ArrayConTamaño *b, Grafo G)
-{
-    printf(" %u ", a->arr[0]);
-    if (maxGrado(a->arr, a->size, G) < maxGrado(b->arr, b->size, G))
-    {
-        return 1;
-    } else if (maxGrado(a->arr, a->size, G) > maxGrado(b->arr, b->size, G))
-    {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-
 
 u32 Greedy(Grafo G,u32* Orden)
 {
@@ -136,9 +54,6 @@ u32 Greedy(Grafo G,u32* Orden)
         }
     }
     
-    
-    printf("Maximo color: %u\n", corMax);
-    printf("Numeros lados: %u\n", NumeroDeLados(G));
     printf("----------  G R E E D Y    C O M P L E T O ----------\n");
     return corMax;
 }
@@ -199,23 +114,18 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
                 if (cor % 4 == 0)
                 {
                     divisibles4[size_divisibles4++] = i;
-                    //printf("  Vertice con color divisible por 4: %u\n", i);
                 }
                 else if (cor % 2 == 0 && cor % 4 != 0)
                 {
                     pares[size_pares++] = i;
-    
-                    //printf("  Vertice con color divisible solo por 2: %u\n", i);
                 }
                 else
                 {
                     impares[size_impares++] = i;
-                    //printf("  Vertice con color divisible impar: %u\n", i);
                 }
             }
         }
 
-        // SIEMPRE AÑADIIIIR <-------- nuevo 4/29/2024
         if (size_divisibles4 != 0) 
         {
             Div4[index_Div4].size = size_divisibles4;
@@ -231,53 +141,38 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
             Impar[index_Impar].size = size_impares;
             Impar[index_Impar++].arr = impares;
             
-        } // No biyectivo por que no lo metemos en Orden
+        }
     }
     
     u32 index = 0;
-    printf("\n\n");
+
     qsort_r(Div4, index_Div4, sizeof(struct ArrayConTamaño), M, G);
-    printf("        Cantidad de colores div4: %u\n", index_Div4);
     for (u32 i = 0; i < index_Div4; i++)
     {   
-        printf("        Cantidad de color %u: %u\n", Color(Div4[i].arr[0],G), Div4[i].size);
-        printf("        Vertices con color %u:       ", Color(Div4[i].arr[0],G));
         for (u32 j = 0; j < Div4[i].size; j++)
         {
-            printf(" %u ", Div4[i].arr[j]);
             Orden[index++] = Div4[i].arr[j];
         }
         free(Div4[i].arr);
     }
-    printf("\n\n");
-    qsort_r(Par, index_Par, sizeof(struct ArrayConTamaño), M, G);
-    printf("        Cantidad de colores pares: %u\n", index_Par);
+
+    qsort_r(Par, index_Par, sizeof(struct ArrayConTamaño), M_m, G);
     for (u32 i = 0; i < index_Par; i++)
     {
-        printf("        Cantidad de color %u: %u\n", Color(Par[i].arr[0], G), Par[i].size);
-        printf("        Vertices con color %u:       ", Color(Par[i].arr[0], G));
         for (u32 j = 0; j < Par[i].size; j++)
         {
-            printf(" %u ", Par[i].arr[j]);
             Orden[index++] = Par[i].arr[j];
         }
-        printf("\n");
         free(Par[i].arr);
     }
-    printf("\n\n");
-    qsort_r(Impar, index_Impar, sizeof(struct ArrayConTamaño), M, G);
-    printf("        Cantidad de colores impares: %u\n", index_Impar);
+
+    qsort_r(Impar, index_Impar, sizeof(struct ArrayConTamaño), m, G);
     for (u32 i = 0; i < index_Impar; i++)
     {
-        printf("        Cantidad de color %u: %u\n", Color(Impar[i].arr[0], G), Impar[i].size);
-        printf("        Vertices con color %u:       ", Color(Impar[i].arr[0], G));
-        printf("[");
         for (u32 j = 0; j < Impar[i].size; j++)
         {
-            printf(" %u ", Impar[i].arr[j]);
             Orden[index++] = Impar[i].arr[j];
         }
-        printf("]\n");
         free(Impar[i].arr);
     }
     printf("\n\n");
@@ -298,8 +193,6 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         printf(" %u ", Grado(Orden[i], G));
     }
     printf("\n\n");
-   
-    printf("index_Div4: %u, index_Par: %u, index_Impar: %u\n", index_Div4, index_Par, index_Impar);
 
     return '0'; // si esta bien devuelve esto, consigna
 }

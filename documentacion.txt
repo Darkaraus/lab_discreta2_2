@@ -9,7 +9,7 @@ funcionar con otras implementaciones de otros grupos.
 
 
 Compilar con esta hueva:
-    gcc -Wall -Wextra -O3 -std=c99 -fsanitize=address -o main main.c funciones.c funciones2.c
+    gcc -Wall -Wextra -O3 -std=c99 -o main main.c funciones.c funciones2.c funciones_aux.c 
 
 despues:
     ./main < K5.txt
