@@ -32,3 +32,6 @@ u32 M(struct ArrayConTamaño *a, struct ArrayConTamaño *b, Grafo G);
 
 u32 M_m(struct ArrayConTamaño *a, struct ArrayConTamaño *b, Grafo G);
 
+u32 compGrados(u32 a, u32 b, Grafo G); // usado en Main
+
+u32 Iterar(Grafo G, u32 *Orden, u32 *coloreo, bool mode); // usado en Main

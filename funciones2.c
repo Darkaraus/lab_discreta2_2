@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h> // para memset
 #include "API2024Parte2.h"
 
 
@@ -14,10 +15,8 @@ u32 Greedy(Grafo G,u32* Orden)
     bool is_biyeccion = checkOrden(cantVertice, Orden);
     if (!is_biyeccion) // 
     {
-        printf("Orden No Biyectivo\n");
         return(POTENCIA);
     }
-    printf("Orden Biyectivo\n");
 
     // Vuelvo colores a 0
     for (size_t i = 0; i < cantVertice; i++)
@@ -54,7 +53,6 @@ u32 Greedy(Grafo G,u32* Orden)
         }
     }
     
-    printf("----------  G R E E D Y    C O M P L E T O ----------\n");
     return corMax;
 }
 
@@ -102,6 +100,11 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         u32 *divisibles4 = malloc(cantVertice * sizeof(u32)); // array temporales para cada color. Se ordenan y se añaden al grande de su categoria (PROGAMACION!!!)
         u32 *pares = malloc(cantVertice * sizeof(u32));
         u32 *impares = malloc(cantVertice * sizeof(u32));
+        if (divisibles4 == NULL || pares == NULL || impares == NULL)
+        {
+            return '1';
+        }
+        
 
         u32 size_divisibles4 = 0;
         u32 size_pares = 0;
@@ -130,21 +133,30 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         {
             Div4[index_Div4].size = size_divisibles4;
             Div4[index_Div4++].arr = divisibles4;
-            free(pares);
-            free(impares);
-            
-        } else if (size_pares != 0)
+        } 
+        else 
+        {
+            free(divisibles4);
+        }
+
+        if (size_pares != 0)
         {
             Par[index_Par].size = size_pares;
             Par[index_Par++].arr = pares;
-            free(divisibles4);
-            free(impares);
-        } else if (size_impares != 0)
+        } 
+        else 
+        {
+            free(pares);
+        }
+
+        if (size_impares != 0)
         {
             Impar[index_Impar].size = size_impares;
             Impar[index_Impar++].arr = impares;
-            free(divisibles4);
-            free(pares);
+        } 
+        else 
+        {
+            free(impares);
         }
     }
     
@@ -179,24 +191,6 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         }
         free(Impar[i].arr);
     }
-    printf("\n\n");
-    printf("Nuevo orden mundial: \n");
-    printf("id:   ");
-    for (u32 i = 0; i < cantVertice; i++)
-    {
-        printf(" %u ", Orden[i]);
-    }
-    printf("\ncolor:");
-    for (u32 i = 0; i < cantVertice; i++)
-    {
-        printf(" %u ", Color(Orden[i], G));
-    }
-    printf("\ngrado:");
-    for (u32 i = 0; i < cantVertice; i++)
-    {
-        printf(" %u ", Grado(Orden[i], G));
-    }
-    printf("\n\n");
 
     return '0'; // si esta bien devuelve esto, consigna
 }
@@ -223,7 +217,7 @@ char ElimGarak(Grafo G,u32* Orden)
         } else if (vertColores[i] == 1 && f1){
             CantVecesColor[vertColores[i]] = NumeroDeVertices(G);
             f1 = false;
-        } else {
+        } else if (vertColores[i] != 1 && vertColores[i] != 2){
             CantVecesColor[vertColores[i]]++;
         }
     }
