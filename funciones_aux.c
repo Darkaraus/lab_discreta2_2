@@ -43,9 +43,29 @@ bool checkOrden(u32 size, u32* Orden)
     return founded;
 }
 
+int CompareColor(const void *a, const void *b, void *arg) {
+    struct argumentos *args = (struct argumentos*)arg;
+    u32 vertexA = *(u32*)a;
+    u32 vertexB = *(u32*)b;
+    u32 colorA = Color(vertexA, args->grafo);
+    u32 colorB = Color(vertexB, args->grafo);
+    
+    if (args->arr[colorA] < args->arr[colorB]) {
+        return -1; // Orden descendente
+    } else if (args->arr[colorA] > args->arr[colorB]) {
+        return 1; // Orden descendente
+    } else if (colorA > colorB){
+        return 1; // Los elementos son iguales
+    } else if (colorA < colorB){
+        return -1; // Los elementos son iguales
+    } else {
+        return 0; // Los elementos son iguales
+    }
+}
+
 u32 minGrado(u32* array_de_ids, u32 size_de_ese_array, Grafo G)
 {
-    u32 zaza = 0;
+    u32 zaza = POTENCIA;
     for (u32 i = 0; i < size_de_ese_array; i++)
     {
         if (zaza > Grado(array_de_ids[i], G))
@@ -54,6 +74,7 @@ u32 minGrado(u32* array_de_ids, u32 size_de_ese_array, Grafo G)
         } 
     }
     
+    printf(" <%u> ", zaza);
     return zaza;
 }
 

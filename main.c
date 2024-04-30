@@ -17,7 +17,7 @@ int main()
     // Si o si el tamaño de Orden tiene que ser la cantidad de vertices, por la consigna.
     
     u32 Orden[9];
-    GulDukat(G, Orden); // Al principio, todos colores 0, es el orden natural, 0,1,2,3,...
+    ElimGarak(G, Orden); // Al principio, todos colores 0, es el orden natural, 0,1,2,3,...
     Greedy(G, Orden);
     GulDukat(G, Orden);
     Greedy(G, Orden);

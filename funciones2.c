@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "API2024Parte2.h"
 
-#define POTENCIA 4294967295U
+
 
 // No hace falta chequear el tamaño de Orden, siempre es n, consigna. 
 
@@ -130,17 +130,21 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         {
             Div4[index_Div4].size = size_divisibles4;
             Div4[index_Div4++].arr = divisibles4;
+            free(pares);
+            free(impares);
             
         } else if (size_pares != 0)
         {
             Par[index_Par].size = size_pares;
             Par[index_Par++].arr = pares;
-            
+            free(divisibles4);
+            free(impares);
         } else if (size_impares != 0)
         {
             Impar[index_Impar].size = size_impares;
             Impar[index_Impar++].arr = impares;
-            
+            free(divisibles4);
+            free(pares);
         }
     }
     
@@ -155,7 +159,7 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         }
         free(Div4[i].arr);
     }
-
+    
     qsort_r(Par, index_Par, sizeof(struct ArrayConTamaño), M_m, G);
     for (u32 i = 0; i < index_Par; i++)
     {
@@ -195,4 +199,50 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
     printf("\n\n");
 
     return '0'; // si esta bien devuelve esto, consigna
+}
+
+char ElimGarak(Grafo G,u32* Orden)
+{   
+    color *vertColores = calloc(NumeroDeVertices(G), sizeof(color));
+    ExtraerColores(G, vertColores);
+    u32 *CantVecesColor = calloc(NumeroDeVertices(G), sizeof(u32));
+    u32 Vertices[NumeroDeVertices(G)];
+    bool f1 = true; //Solo necesitamos que la cardinalidaad de 1 y 2 se asignen una vez
+    bool f2 = true;
+
+    //Creamos el arreglo con los vertices ordenados por cardinalidad
+    /*  Cuando encontremos un vertice con color 1 le asignamos la cardinalidad maxima, cuando encontremos uno con 2
+        Con el resto simplemente en relacion a cuantas veces ocurren    */
+    //Tomo el array de colores, para determinar la cantidad de veces que se uso cada color 
+    for (u32 i = 0; i < NumeroDeVertices(G); i++)
+    {   
+        Vertices[i] = i;
+        if (vertColores[i] == 2 && f2){
+            CantVecesColor[vertColores[i]] = NumeroDeVertices(G) - 1;
+            f2 = false;
+        } else if (vertColores[i] == 1 && f1){
+            CantVecesColor[vertColores[i]] = NumeroDeVertices(G);
+            f1 = false;
+        } else {
+            CantVecesColor[vertColores[i]]++;
+        }
+    }
+    //Entonces en CantVecesColor[1] tengo la cantidad de veces que se uso el color 1
+
+    
+    struct argumentos args;
+    args.arr = CantVecesColor;
+    args.grafo = G;
+
+    //mergeSort(Vertices, 0, NumeroDeVertices(G) - 1, CantVecesColor, G);
+    qsort_r(Vertices, NumeroDeVertices(G), sizeof(u32), CompareColor, &args);
+
+    for (u32 i = 0; i < NumeroDeVertices(G); i++)
+    {
+        Orden[i] = Vertices[i];
+    }
+
+    free(vertColores);
+    free(CantVecesColor);
+    return 0;
 }
