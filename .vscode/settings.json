@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "api2024parte2.h": "c",
+        "stdbool.h": "c",
+        "estructuragrafo24.h": "c"
+    }
+}

@@ -9,7 +9,7 @@ bool checkOrden(u32 size, u32* Orden)
 {
 
     // array de bools...
-    bool *found_vertices = malloc(size * sizeof(bool));
+    bool *found_vertices = calloc(size, sizeof(bool));
 
     // Error por si no funca malloc...
     if (found_vertices == NULL)
@@ -147,6 +147,14 @@ u32 compGrados(u32 a, u32 b, Grafo G)
     }
 }
 
+void loadingAnimation() {
+    static const char spinner[] = "|/-\\"; // Characters for spinning animation
+    static int spinIndex = 0;
+    printf("\r%c", spinner[spinIndex]); // Print the current character without newline
+    fflush(stdout); // Flush stdout to ensure it's printed immediately
+    spinIndex = (spinIndex + 1) % 4; // Cycle through spinner characters
+}
+
 u32 Iterar(Grafo G, u32 *Orden, u32 *coloreo, bool mode)
 {
     if (mode)
@@ -172,22 +180,26 @@ u32 Iterar(Grafo G, u32 *Orden, u32 *coloreo, bool mode)
         int random = rand() % 2;
         if (random == 1)
         {
-            printf("\n\nOrden Seleccionado: GulDukat\n");
+            printf("\n\nOrden Seleccionado: GulDukat\nIterando 500 veces...\n");
             for (u32 i = 0; i < 500; i++)
             {
                 GulDukat(G, Orden);
                 Greedy(G, Orden);
+                loadingAnimation();
             }
-            printf("Iterando 500 veces...\nChi Aproximado: %u \n",Greedy(G, Orden));
+            printf("Chi Aproximado: %u \n",Greedy(G, Orden));
             return POTENCIA;
         } else {
-            printf("\n\nOrden Seleccionado: ElimGarak\n");
+            printf("\n\nOrden Seleccionado: ElimGarak\nIterando 500 veces...\n");
             for (u32 i = 0; i < 500; i++)
             {
                 ElimGarak(G, Orden);
                 Greedy(G, Orden);
+                loadingAnimation();
             }
-            printf("Iterando 500 veces...\nChi Aproximado: %u \n",Greedy(G, Orden));
+            fflush(stdout);
+            printf("\b \b");
+            printf("Chi Aproximado: %u \n",Greedy(G, Orden));
             return POTENCIA;
         }        
     }

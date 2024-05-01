@@ -28,7 +28,7 @@ u32 Greedy(Grafo G,u32* Orden)
     u32 corMax = 0;
     for (size_t i = 0; i < cantVertice; i++)
     {
-        bool coloresUsados[cantVertice + 1]; // Array de colores usados
+        bool *coloresUsados = calloc(Delta(G) + 1, sizeof(bool)); // Array de colores usados
         memset(coloresUsados, false, sizeof(coloresUsados)); // Inicializamos en false
 
         for (size_t k = 0; k < Grado(Orden[i], G); k++) 
@@ -51,6 +51,7 @@ u32 Greedy(Grafo G,u32* Orden)
         {
             corMax = cor;
         }
+        free(coloresUsados);
     }
     
     return corMax;
@@ -59,7 +60,7 @@ u32 Greedy(Grafo G,u32* Orden)
 char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un mate o un cafe <!!!>
 {   
     u32 cantVertice = NumeroDeVertices(G);
-    color *vertColores = malloc(NumeroDeVertices(G) * sizeof(color));
+    color *vertColores = calloc(cantVertice, sizeof(color));
     if (vertColores == NULL)
     {
         return '1'; // si da error devuelve esto, consigna
@@ -78,10 +79,10 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
     free(vertColores); // El array solo fue usado para conseguir el color maximo... Era para darle uso a ExtraerColores, para que sirve si no? capaz sirva jajaja
     // REINICIAR CEREBRO, solo conseguimos el color maximo
 
-    struct ArrayConTamaño Div4[cantVertice];
-    struct ArrayConTamaño Par[cantVertice];
-    struct ArrayConTamaño Impar[cantVertice];
-
+    struct ArrayConTamaño *Div4 = calloc(cantVertice, sizeof(struct ArrayConTamaño));;
+    struct ArrayConTamaño *Par = calloc(cantVertice, sizeof(struct ArrayConTamaño));;
+    struct ArrayConTamaño *Impar = calloc(cantVertice, sizeof(struct ArrayConTamaño));;
+    
     // Inicializamos tamaños
     for (u32 i = 0; i < cantVertice; i++)
     {
@@ -97,9 +98,9 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
 
     for (u32 cor = 0; cor <= corMax; cor++)
     {
-        u32 *divisibles4 = malloc(cantVertice * sizeof(u32)); // array temporales para cada color. Se ordenan y se añaden al grande de su categoria (PROGAMACION!!!)
-        u32 *pares = malloc(cantVertice * sizeof(u32));
-        u32 *impares = malloc(cantVertice * sizeof(u32));
+        u32 *divisibles4 = calloc(cantVertice, sizeof(u32)); // array temporales para cada color. Se ordenan y se añaden al grande de su categoria (PROGAMACION!!!)
+        u32 *pares = calloc(cantVertice, sizeof(u32));
+        u32 *impares = calloc(cantVertice, sizeof(u32));
         if (divisibles4 == NULL || pares == NULL || impares == NULL)
         {
             return '1';
@@ -191,7 +192,7 @@ char GulDukat(Grafo G,u32* Orden) // <!!!> Leer todos los comentarios, Hacete un
         }
         free(Impar[i].arr);
     }
-
+    free(Div4);free(Par);free(Impar);
     return '0'; // si esta bien devuelve esto, consigna
 }
 
@@ -200,7 +201,7 @@ char ElimGarak(Grafo G,u32* Orden)
     color *vertColores = calloc(NumeroDeVertices(G), sizeof(color));
     ExtraerColores(G, vertColores);
     u32 *CantVecesColor = calloc(NumeroDeVertices(G), sizeof(u32));
-    u32 Vertices[NumeroDeVertices(G)];
+    u32 *Vertices = calloc(NumeroDeVertices(G), sizeof(u32));;
     bool f1 = true; //Solo necesitamos que la cardinalidaad de 1 y 2 se asignen una vez
     bool f2 = true;
 
@@ -238,5 +239,6 @@ char ElimGarak(Grafo G,u32* Orden)
 
     free(vertColores);
     free(CantVecesColor);
+    free(Vertices);
     return 0;
 }
